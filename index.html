@@ -1,0 +1,1146 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>نظام طلبات الإفطار | مدرسة عائشة بنت طلحة</title>
+
+<!-- PDF (تحويل HTML إلى PDF) -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<!-- QR -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
+<style>
+  :root{
+    --bg:#f4f6fb;
+    --card:#fff;
+    --ink:#0f172a;
+    --muted:#475569;
+    --pri:#2563eb;
+    --ok:#16a34a;
+    --bad:#dc2626;
+    --line:#e2e8f0;
+    --shadow:0 10px 25px rgba(0,0,0,.08);
+    --rad:14px;
+  }
+  body{margin:0;font-family:Tahoma,Arial;background:var(--bg);color:var(--ink)}
+  header{
+    background:linear-gradient(90deg,#1e3a8a,#2563eb);
+    color:#fff;padding:16px;text-align:center
+  }
+  header h2{margin:0 0 4px;font-size:20px}
+  header .sub{opacity:.9;font-size:13px}
+  .container{max-width:1200px;margin:auto;padding:14px}
+  .grid{display:grid;gap:12px}
+  @media(min-width:980px){.grid{grid-template-columns:1.05fr .95fr}}
+  .card{
+    background:var(--card);border:1px solid var(--line);
+    border-radius:var(--rad);padding:14px;box-shadow:var(--shadow)
+  }
+  h3{margin:0 0 10px;font-size:16px}
+  .hint{color:var(--muted);font-size:13px;line-height:1.6}
+  label{display:block;margin-top:10px;color:var(--muted);font-size:13px}
+  input,select,textarea{
+    width:100%;padding:10px;border:1px solid var(--line);
+    border-radius:10px;margin-top:6px;font-size:14px;outline:none
+  }
+  textarea{min-height:110px;resize:vertical}
+  .row{display:grid;gap:10px}
+  @media(min-width:720px){.row.two{grid-template-columns:1fr 1fr}}
+  @media(min-width:720px){.row.three{grid-template-columns:1fr 1fr 1fr}}
+  .btnRow{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+  button{
+    padding:10px 14px;border:0;border-radius:10px;cursor:pointer;
+    font-size:14px;font-weight:700
+  }
+  .primary{background:var(--pri);color:#fff}
+  .success{background:var(--ok);color:#fff}
+  .danger{background:var(--bad);color:#fff}
+  .ghost{background:#eef2ff;color:#1e3a8a;border:1px solid #c7d2fe}
+  .pill{
+    display:inline-flex;gap:8px;align-items:center;
+    border:1px dashed var(--line);border-radius:999px;padding:8px 12px;
+    background:#f8fafc;color:var(--muted);font-size:13px
+  }
+  table{width:100%;border-collapse:collapse;margin-top:12px}
+  th,td{border:1px solid var(--line);padding:8px;text-align:center;font-size:13px}
+  th{background:#f1f5f9}
+  .summary{
+    display:flex;gap:10px;flex-wrap:wrap;margin-top:10px
+  }
+  .summary .box{
+    flex:1;min-width:160px;background:#f8fafc;border:1px solid var(--line);
+    border-radius:12px;padding:10px;text-align:center
+  }
+  .summary .box b{display:block;font-size:18px}
+  .split{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+  .qrBox{border:1px solid var(--line);border-radius:12px;padding:12px;background:#f8fafc}
+  .mono{font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace}
+  .lock{border:1px solid #fecaca;background:#fff1f2;color:#7f1d1d;padding:10px;border-radius:12px}
+  .okBox{border:1px solid #bbf7d0;background:#f0fdf4;color:#14532d;padding:10px;border-radius:12px}
+  .tabs{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+  .tab{padding:9px 12px;border:1px solid var(--line);border-radius:12px;background:#f8fafc;cursor:pointer}
+  .tab.active{border-color:#93c5fd;background:#eef2ff;color:#1e3a8a;font-weight:800}
+  .hr{height:1px;background:var(--line);margin:12px 0}
+  .small{font-size:12px}
+  select[multiple]{min-height:120px}
+
+  .multiWrap{position:relative}
+  .multiBtn{width:100%;text-align:right;background:#fff;border:1px solid var(--line);padding:10px;border-radius:10px;cursor:pointer;font-size:14px}
+  .multiPanel{position:absolute;z-index:50;left:0;right:0;top:calc(100% + 6px);background:#fff;border:1px solid var(--line);border-radius:12px;box-shadow:var(--shadow);max-height:280px;overflow:auto;padding:8px;display:none}
+  .multiRow{display:flex;align-items:center;gap:10px;padding:8px;border-radius:10px}
+  .multiRow:hover{background:#f8fafc}
+  .multiRow .ck{width:16px;height:16px;flex:0 0 auto}
+  .multiRow .ttl{flex:1;min-width:140px;font-size:13px}
+  .multiRow .desc{display:block;color:var(--muted);font-size:12px;margin-top:2px}
+  .multiRow .qtySel{width:90px;max-width:90px;padding:8px;margin-top:0}
+</style>
+</head>
+
+<body>
+<header>
+  <h2>نظام متابعة طلبات وجبة الإفطار</h2>
+  <div class="sub">مدرسة عائشة بنت طلحة • حفظ محلي داخل المتصفح</div>
+</header>
+
+<div class="container">
+  <div class="grid">
+
+    <!-- واجهة الطالبة -->
+    <div class="card">
+      <h3>🧕 طلب الطالبة</h3>
+      <div class="pill" id="gatePill">⏱️ يتم التحقق من الوقت…</div>
+      <div class="hint" style="margin-top:8px">
+        ✅ الطلب مسموح قبل <b class="mono" id="deadlineShow">09:00</b> صباحًا.
+        <br>⚠️ الإغلاق يعتمد على وقت الجهاز.
+      </div>
+
+      <div class="row three" style="margin-top:12px">
+        <div>
+          <label>الصف</label>
+          <select id="gradeSel">
+            <option value="">— اختر الصف —</option>
+          </select>
+        </div>
+        <div>
+          <label>الشعبة</label>
+          <select id="sectionSel" disabled>
+            <option value="">— اختر الشعبة —</option>
+          </select>
+        </div>
+        <div>
+          <label>اسم الطالبة</label>
+          <select id="studentSel" disabled>
+            <option value="">— اختر الاسم —</option>
+          </select>
+          <div class="hint small">إذا لم تظهر الأسماء: من لوحة المشرفة → الطالبات → استيراد/إدراج القائمة.</div>
+        </div>
+      </div>
+
+      <div class="row two">
+        <div>
+          <label>اختيار الوجبات (يمكن اختيار أكثر من صنف)</label>
+          <div class="multiWrap" id="mealsWrap">
+            <button type="button" class="multiBtn" id="mealsBtn">— اختر الوجبات —</button>
+            <div class="multiPanel" id="mealsPanel"></div>
+          </div>
+          <div class="hint small">اختاري الوجبات ثم حددي الكمية (1–10) لكل صنف.</div>
+        </div>
+        <div>
+          <label>ملاحظات</label>
+          <textarea id="note" placeholder="مثال: بدون جبن / حساسية..."></textarea>
+        </div>
+      </div>
+
+      <div class="btnRow">
+        <button class="success" id="btnOrder">✅ إرسال الطلب</button>
+        <button class="ghost" id="btnClear">↩️ مسح</button>
+      </div>
+
+      <div style="margin-top:12px" id="myOrderBox" class="hint">لا يوجد طلب مسجل بعد.</div>
+    </div>
+
+    <!-- لوحة المشرفة -->
+    <div class="card">
+      <h3>👩‍🏫 لوحة المشرفة</h3>
+
+      <div id="adminLock" class="lock">
+        🔒 اللوحة مقفلة. اضغطي “فتح اللوحة” وأدخلي رمز الإدارة.
+      </div>
+
+      <div class="btnRow" style="margin-top:10px">
+        <button class="primary" id="btnUnlock">🔓 فتح اللوحة</button>
+        <button class="ghost" id="btnLock">🔒 قفل</button>
+      </div>
+
+      <div id="adminArea" style="display:none; margin-top:12px">
+        <div class="tabs">
+          <div class="tab active" data-tab="dash">الطلبات</div>
+          <div class="tab" data-tab="students">الطالبات</div>
+          <div class="tab" data-tab="meals">الوجبات</div>
+          <div class="tab" data-tab="qr">QR / واتساب</div>
+          <div class="tab" data-tab="settings">الإعدادات</div>
+        </div>
+
+        <div class="hr"></div>
+
+        <!-- تبويب الطلبات -->
+        <div id="tab_dash">
+          <div class="summary">
+            <div class="box"><b id="kpiTotal">0</b><span class="hint">إجمالي طلبات اليوم</span></div>
+            <div class="box"><b id="kpiItems">0</b><span class="hint">عدد الأصناف المطلوبة</span></div>
+            <div class="box"><b id="kpiTop">—</b><span class="hint">الأكثر طلبًا</span></div>
+          </div>
+
+          <div class="btnRow" style="margin-top:12px">
+            <button class="primary" id="btnMakePdf">🧾 إنشاء PDF لطلبات اليوم</button>
+            <button class="success" id="btnShareWA">📲 مشاركة PDF عبر واتساب مباشرة</button>
+            <button class="danger" id="btnClearToday">🧹 مسح طلبات اليوم</button>
+          </div>
+
+          <table id="ordersTable">
+            <thead>
+              <tr>
+                <th>#</th><th>الوقت</th><th>الطالبة</th><th>الصف</th><th>الشعبة</th><th>الوجبات</th><th>ملاحظات</th>
+              </tr>
+            </thead>
+            <tbody></tbody>
+          </table>
+
+          <div class="hint" style="margin-top:10px">
+            ✅ مشاركة واتساب:
+            <br>• على الهاتف: يحاول مشاركة ملف PDF مباشرة.
+            <br>• على الكمبيوتر: ينزّل PDF ثم يفتح واتساب ويب برسالة جاهزة وتقومين بإرفاق الملف يدويًا.
+          </div>
+        </div>
+
+        <!-- تبويب الطالبات -->
+        <div id="tab_students" style="display:none">
+          <div class="hint">
+            الصيغة المطلوبة (CSV): <span class="mono">name,grade,section</span><br>
+            مثال: <span class="mono">آمنة الهنائية,السابع,أ</span>
+          </div>
+
+          <div class="row two" style="margin-top:10px">
+            <div>
+              <label>رفع ملف CSV</label>
+              <input type="file" id="csvFile" accept=".csv,text/csv">
+            </div>
+            <div>
+              <label>أو لصق CSV هنا</label>
+              <textarea id="csvPaste" placeholder="name,grade,section&#10;..."></textarea>
+            </div>
+          </div>
+
+          <div class="btnRow">
+            <button class="success" id="btnImportCsv">✅ استيراد/دمج</button>
+            <button class="ghost" id="btnDownloadTemplate">📄 تنزيل قالب CSV</button>
+            <button class="danger" id="btnClearRoster">🧹 مسح قائمة الطالبات</button>
+          </div>
+
+          <div style="margin-top:10px" id="rosterInfo" class="okBox">لا توجد بيانات بعد.</div>
+        </div>
+
+        <!-- تبويب الوجبات -->
+        <div id="tab_meals" style="display:none">
+          <div class="hint">كل سطر = صنف. يمكنك إضافة وصف بعد | (اختياري)</div>
+          <label>قائمة الوجبات</label>
+          <textarea id="mealsInp" placeholder="ساندويتش جبن | مع خيار&#10;فطيرة زعتر | ساخنة"></textarea>
+
+          <div class="btnRow">
+            <button class="success" id="btnSaveMeals">💾 حفظ الوجبات</button>
+            <button class="ghost" id="btnMealsDefault">↩️ افتراضي</button>
+          </div>
+
+          <div class="hint" style="margin-top:10px">
+            بعد الحفظ: ستظهر للطالبة كقائمة منسدلة متعددة الاختيار.
+          </div>
+        </div>
+
+        <!-- تبويب QR -->
+        <div id="tab_qr" style="display:none">
+          <div class="card" style="box-shadow:none;border-radius:12px;padding:12px;border:1px solid var(--line);background:#fff">
+            <h3 style="margin:0 0 10px">📌 QR للطالبات + رقم واتساب المُجهِّزة</h3>
+            <div class="row two">
+              <div>
+                <label>رابط صفحة الطلب (لإنشاء QR)</label>
+                <input id="pageUrl" class="mono" placeholder="https://...">
+              </div>
+              <div>
+                <label>رقم واتساب المُجهِّزة (مع رمز الدولة)</label>
+                <input id="cookWhatsApp" class="mono" placeholder="مثال: 9689XXXXXXX" inputmode="numeric">
+              </div>
+            </div>
+
+            <div class="btnRow">
+              <button class="primary" id="btnSaveQrWa">💾 حفظ</button>
+              <button class="ghost" id="btnRefreshQr">🔄 تحديث QR</button>
+              <button class="ghost" id="btnCopyUrl">📋 نسخ الرابط</button>
+            </div>
+
+            <div class="split" style="margin-top:10px">
+              <div class="qrBox">
+                <canvas id="qrCanvas" width="210" height="210" style="display:block;background:#fff;border-radius:10px"></canvas>
+                <div class="hint small" style="margin-top:8px">اطبعيه والصقيه في مكان واضح.</div>
+              </div>
+              <div style="flex:1;min-width:240px">
+                <div class="hint small">الرابط الحالي:</div>
+                <div id="qrText" class="mono" style="padding:10px;border:1px solid var(--line);border-radius:10px;background:#f8fafc;word-break:break-all"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- تبويب الإعدادات -->
+        <div id="tab_settings" style="display:none">
+          <div class="hint">يمكن تغيير وقت الإغلاق ورمز الإدارة.</div>
+          <div class="row two" style="margin-top:10px">
+            <div>
+              <label>وقت إغلاق الطلبات (HH:MM)</label>
+              <input id="deadlineInp" class="mono" placeholder="09:00">
+            </div>
+            <div>
+              <label>رمز الإدارة الجديد (4 أرقام)</label>
+              <input id="pinInp" class="mono" maxlength="4" placeholder="••••" inputmode="numeric">
+              <div class="hint small">الرمز الافتراضي: <span class="mono">1234</span></div>
+            </div>
+          </div>
+
+          <div class="btnRow">
+            <button class="success" id="btnSaveSettings">💾 حفظ الإعدادات</button>
+            <button class="ghost" id="btnDefaultsAll">↩️ افتراضي</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ====== قالب PDF مخفي ====== -->
+<div id="pdfContent" style="position:absolute;left:-99999px;top:0;width:210mm;padding:14mm;background:#fff;color:#111;font-family:Arial,Tahoma;direction:rtl;">
+  <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;">
+    <div>
+      <div style="font-size:18px;font-weight:800">مدرسة عائشة بنت طلحة</div>
+      <div style="font-size:13px;margin-top:4px;color:#333">
+        طلبات وجبة الإفطار • <span id="pdfDate"></span> • الإغلاق: <span id="pdfDeadline" class="mono"></span>
+      </div>
+    </div>
+    <div style="text-align:left;font-size:12px;color:#333">
+      تم التصدير: <span id="pdfExportTime" class="mono"></span>
+    </div>
+  </div>
+
+  <!-- شريط ملخص احترافي -->
+  <div style="margin-top:12px;border:1px solid #e5e7eb;border-radius:14px;padding:12px;background:#f8fafc;">
+    <div style="display:flex;gap:10px;flex-wrap:wrap;">
+      <div style="flex:1;min-width:150px;border-radius:12px;background:#fff;border:1px solid #e5e7eb;padding:10px;text-align:center;">
+        <div style="font-size:12px;color:#666">إجمالي الطلبات</div>
+        <div style="font-size:20px;font-weight:800" id="pdfKpiTotal">0</div>
+      </div>
+      <div style="flex:1;min-width:150px;border-radius:12px;background:#fff;border:1px solid #e5e7eb;padding:10px;text-align:center;">
+        <div style="font-size:12px;color:#666">عدد الأصناف</div>
+        <div style="font-size:20px;font-weight:800" id="pdfKpiItems">0</div>
+      </div>
+      <div style="flex:2;min-width:240px;border-radius:12px;background:#fff;border:1px solid #e5e7eb;padding:10px;">
+        <div style="font-size:12px;color:#666">الأكثر طلبًا + Top 3</div>
+        <div style="margin-top:6px;font-size:13px" id="pdfTopLine">—</div>
+      </div>
+      <div style="flex:1;min-width:150px;border-radius:12px;background:#fff;border:1px solid #e5e7eb;padding:10px;text-align:center;">
+        <div style="font-size:12px;color:#666">آخر طلب (وقت)</div>
+        <div style="font-size:18px;font-weight:800" id="pdfLastTime" class="mono">—</div>
+      </div>
+    </div>
+  </div>
+
+  <div style="margin-top:10px;">
+    <div style="font-weight:800;margin:8px 0 6px;">ملخص الكميات حسب الصنف</div>
+    <div id="pdfSummary" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+  </div>
+
+  <div style="font-weight:800;margin:10px 0 6px;">تفاصيل الطلبات</div>
+  <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+    <thead>
+      <tr>
+        <th style="border:1px solid #ddd;padding:6px;">#</th>
+        <th style="border:1px solid #ddd;padding:6px;">الوقت</th>
+        <th style="border:1px solid #ddd;padding:6px;">الطالبة</th>
+        <th style="border:1px solid #ddd;padding:6px;">الصف</th>
+        <th style="border:1px solid #ddd;padding:6px;">الشعبة</th>
+        <th style="border:1px solid #ddd;padding:6px;">الوجبات</th>
+        <th style="border:1px solid #ddd;padding:6px;">ملاحظات</th>
+      </tr>
+    </thead>
+    <tbody id="pdfTable"></tbody>
+  </table>
+
+  <div style="margin-top:10px;font-size:11px;color:#555;">
+    ملاحظة: هذه القائمة خاصة بطلبات اليوم فقط.
+  </div>
+</div>
+
+<script>
+/* ====== تخزين محلي ====== */
+const LS = {
+  orders: "tbqa.breakfast.orders.v3",
+  roster: "tbqa.breakfast.roster.v1",
+  meals:  "tbqa.breakfast.meals.v1",
+  settings: "tbqa.breakfast.settings.v3",
+  pin: "tbqa.breakfast.pin.v1",
+  unlocked: "tbqa.breakfast.unlocked.v1"
+};
+
+const DEFAULTS = {
+  deadline: "09:00",
+  cookWA: "",
+  pageUrl: "",
+  mealsLines: [
+    "ساندويتش جبن | مع خيار",
+    "فطيرة زعتر | ساخنة",
+    "كرواسون | عادي",
+    "حليب | بارد",
+    "عصير | برتقال"
+  ]
+};
+
+function loadJSON(key, fallback){
+  try{ const v = localStorage.getItem(key); return v ? JSON.parse(v) : fallback; }
+  catch(e){ return fallback; }
+}
+function saveJSON(key, obj){ localStorage.setItem(key, JSON.stringify(obj)); }
+
+function pad2(n){ return String(n).padStart(2,"0"); }
+function todayKey(d=new Date()){
+  return `${d.getFullYear()}-${pad2(d.getMonth()+1)}-${pad2(d.getDate())}`;
+}
+function nowHM(){ const d=new Date(); return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; }
+function nowHMS(){ const d=new Date(); return `${pad2(d.getHours())}:${pad2(d.getMinutes())}:${pad2(d.getSeconds())}`; }
+function timeToMin(hhmm){
+  const m = /^(\d{1,2}):(\d{2})$/.exec((hhmm||"").trim());
+  if(!m) return null;
+  const h=+m[1], mi=+m[2];
+  if(h<0||h>23||mi<0||mi>59) return null;
+  return h*60 + mi;
+}
+function nowMin(){ const d=new Date(); return d.getHours()*60 + d.getMinutes(); }
+function isOpenNow(){
+  const dl = timeToMin(settings.deadline);
+  if(dl === null) return true;
+  return nowMin() < dl;
+}
+function unique(arr){ return Array.from(new Set(arr)); }
+function toast(msg){ alert(msg); }
+
+/* ====== الحالة ====== */
+let settings = loadJSON(LS.settings, null) || {...DEFAULTS};
+let roster = loadJSON(LS.roster, []) || []; // [{name,grade,section}]
+let orders = loadJSON(LS.orders, []) || []; // {date,time,name,grade,section,items[],note}
+let mealsLines = loadJSON(LS.meals, null) || (settings.mealsLines || DEFAULTS.mealsLines);
+let lastPdfBlob = null;
+let lastPdfName = null;
+
+/* ====== قفل لوحة المشرفة ====== */
+function getPin(){ return localStorage.getItem(LS.pin) || "1234"; }
+function isUnlocked(){ return localStorage.getItem(LS.unlocked) === "1"; }
+function setUnlocked(v){ localStorage.setItem(LS.unlocked, v ? "1":"0"); }
+
+function syncAdminUI(){
+  const unlocked = isUnlocked();
+  document.getElementById("adminLock").style.display = unlocked ? "none":"";
+  document.getElementById("adminArea").style.display = unlocked ? "block":"none";
+}
+
+/* ====== تبويبات المشرفة ====== */
+document.querySelectorAll(".tab").forEach(t=>{
+  t.addEventListener("click", ()=>{
+    document.querySelectorAll(".tab").forEach(x=>x.classList.remove("active"));
+    t.classList.add("active");
+    const tab=t.dataset.tab;
+    const map = {
+      dash:"tab_dash",
+      students:"tab_students",
+      meals:"tab_meals",
+      qr:"tab_qr",
+      settings:"tab_settings"
+    };
+    Object.values(map).forEach(id=>document.getElementById(id).style.display="none");
+    document.getElementById(map[tab]).style.display="block";
+  });
+});
+
+/* ====== إعدادات واجهة الطالبات (قائمة الطالبات) ====== */
+const gradeSel = document.getElementById("gradeSel");
+const sectionSel = document.getElementById("sectionSel");
+const studentSel = document.getElementById("studentSel");
+const mealsBtn = document.getElementById("mealsBtn");
+const mealsPanel = document.getElementById("mealsPanel");
+let qtyMap = {}; // {mealName: qty1to10}
+let mealsPanelOpen = false
+function renderRosterFilters(){
+  const grades = unique(roster.map(r=>r.grade)).sort((a,b)=>String(a).localeCompare(String(b),"ar"));
+  gradeSel.innerHTML = `<option value="">— اختر الصف —</option>` + grades.map(g=>`<option>${g}</option>`).join("");
+  sectionSel.innerHTML = `<option value="">— اختر الشعبة —</option>`;
+  sectionSel.disabled = true;
+  studentSel.innerHTML = `<option value="">— اختر الاسم —</option>`;
+  studentSel.disabled = true;
+}
+
+gradeSel.addEventListener("change", ()=>{
+  const g = gradeSel.value;
+  if(!g){
+    sectionSel.disabled = true;
+    studentSel.disabled = true;
+    sectionSel.innerHTML = `<option value="">— اختر الشعبة —</option>`;
+    studentSel.innerHTML = `<option value="">— اختر الاسم —</option>`;
+    renderMyOrder();
+    return;
+  }
+  const sections = unique(roster.filter(r=>r.grade===g).map(r=>r.section)).sort((a,b)=>String(a).localeCompare(String(b),"ar"));
+  sectionSel.innerHTML = `<option value="">— اختر الشعبة —</option>` + sections.map(s=>`<option>${s}</option>`).join("");
+  sectionSel.disabled = false;
+  studentSel.disabled = true;
+  studentSel.innerHTML = `<option value="">— اختر الاسم —</option>`;
+  renderMyOrder();
+});
+
+sectionSel.addEventListener("change", ()=>{
+  const g = gradeSel.value;
+  const s = sectionSel.value;
+  if(!g || !s){
+    studentSel.disabled = true;
+    studentSel.innerHTML = `<option value="">— اختر الاسم —</option>`;
+    renderMyOrder();
+    return;
+  }
+  const students = roster.filter(r=>r.grade===g && r.section===s).map(r=>r.name).sort((a,b)=>String(a).localeCompare(String(b),"ar"));
+  studentSel.innerHTML = `<option value="">— اختر الاسم —</option>` + students.map(n=>`<option>${n}</option>`).join("");
+  studentSel.disabled = false;
+  renderMyOrder();
+});
+
+studentSel.addEventListener("change", renderMyOrder);
+
+/* ====== الوجبات (Multi Select + Qty داخل القائمة) ====== */
+function parseMeals(){
+  const lines = (mealsLines || DEFAULTS.mealsLines).map(x=>String(x||"").trim()).filter(Boolean);
+  return lines.map(line=>{
+    const parts = line.split("|").map(s=>s.trim());
+    return {name: parts[0] || "صنف", desc: parts[1] || ""};
+  });
+}
+
+function setPanelOpen(open){
+  mealsPanelOpen = !!open;
+  mealsPanel.style.display = mealsPanelOpen ? 'block' : 'none';
+}
+
+function updateMealsBtnLabel(){
+  const names = Object.keys(qtyMap).filter(k=>qtyMap[k]);
+  if(names.length===0){
+    mealsBtn.textContent = '— اختر الوجبات —';
+    return;
+  }
+  const preview = names.slice(0,2).map(n=>`${n}×${qtyMap[n]||1}`).join('، ');
+  mealsBtn.textContent = names.length<=2 ? preview : `${preview} … (+${names.length-2})`;
+}
+
+function renderMealsPicker(){
+  const meals = parseMeals();
+  const qtyOptions = Array.from({length:10},(_,i)=>i+1).map(v=>`<option value="${v}">${v}</option>`).join('');
+
+  mealsPanel.innerHTML = meals.map(m=>{
+    const checked = (m.name in qtyMap);
+    const qty = Number(qtyMap[m.name]||1) || 1;
+    const desc = m.desc ? `<span class="desc">${escapeHtml(m.desc)}</span>` : '';
+    return `
+      <div class="multiRow" data-meal="${escapeHtml(m.name)}">
+        <input class="ck" type="checkbox" ${checked?'checked':''} />
+        <div class="ttl">
+          <div><b>${escapeHtml(m.name)}</b></div>
+          ${desc}
+        </div>
+        <select class="qtySel" ${checked?'':'disabled'}>
+          ${qtyOptions}
+        </select>
+      </div>
+    `;
+  }).join('');
+
+  // ضبط القيم الحالية + المستمعات
+  mealsPanel.querySelectorAll('.multiRow').forEach(row=>{
+    const meal = row.getAttribute('data-meal');
+    const ck = row.querySelector('input.ck');
+    const sel = row.querySelector('select.qtySel');
+    if(meal in qtyMap) sel.value = String(qtyMap[meal]||1);
+
+    ck.addEventListener('change', ()=>{
+      if(ck.checked){
+        qtyMap[meal] = qtyMap[meal] || 1
+        sel.disabled = false;
+        sel.value = String(qtyMap[meal]||1);
+      }else{
+        delete qtyMap[meal]
+        sel.disabled = true;
+      }
+      updateMealsBtnLabel();
+    });
+
+    sel.addEventListener('change', ()=>{
+      if(!(meal in qtyMap)) return;
+      const v = Number(sel.value||1);
+      qtyMap[meal] = (v>=1 && v<=10) ? v : 1;
+      updateMealsBtnLabel();
+    });
+  });
+
+  updateMealsBtnLabel();
+}
+
+// تفاعل فتح/إغلاق القائمة
+mealsBtn.addEventListener('click', (e)=>{
+  e.preventDefault();
+  setPanelOpen(!mealsPanelOpen);
+});
+
+// إغلاق عند النقر خارجها
+document.addEventListener('click', (e)=>{
+  const wrap = document.getElementById('mealsWrap');
+  if(!wrap) return;
+  if(!wrap.contains(e.target)) setPanelOpen(false);
+});
+
+function clearMealsSelection(){
+  qtyMap = {};
+  renderMealsPicker();
+  setPanelOpen(false);
+}
+
+function getSelectedMealsDetailed(){
+  return Object.keys(qtyMap).map(name=>({ name, qty: Number(qtyMap[name]||1) || 1 }));
+}
+/* ====== بوابة الوقت ====== */
+function updateGate(){
+  const pill = document.getElementById("gatePill");
+  const dl = settings.deadline || DEFAULTS.deadline;
+  const open = isOpenNow();
+  document.getElementById("deadlineShow").textContent = dl;
+
+  if(open){
+    pill.style.borderColor = "";
+    pill.style.background = "#f8fafc";
+    pill.style.color = "#475569";
+    pill.textContent = `✅ الطلب مفتوح حتى ${dl} — الآن ${nowHM()}`;
+  }else{
+    pill.style.borderColor = "#fecaca";
+    pill.style.background = "#fff1f2";
+    pill.style.color = "#7f1d1d";
+    pill.textContent = `⛔ تم إغلاق الطلبات بعد ${dl} — الآن ${nowHM()}`;
+  }
+  document.getElementById("btnOrder").disabled = !open;
+}
+
+/* ====== طلب الطالبة ====== */
+function findOrderToday(name, grade, section){
+  const t = todayKey();
+  return orders.find(o=>o.date===t && o.name===name && o.grade===grade && o.section===section) || null;
+}
+
+function renderMyOrder(){
+  const box = document.getElementById("myOrderBox");
+  const grade = gradeSel.value;
+  const section = sectionSel.value;
+  const name = studentSel.value;
+
+  if(!grade || !section || !name){
+    box.className = "hint";
+    box.textContent = "اختاري الصف والشعبة واسمك لعرض طلبك هنا.";
+    return;
+  }
+  const o = findOrderToday(name, grade, section);
+  if(!o){
+    box.className = "hint";
+    box.textContent = "لا يوجد طلب مسجل لك اليوم.";
+    return;
+  }
+  box.className = "okBox";
+  box.innerHTML = `
+    ✅ تم تسجيل طلبك اليوم
+    <div style="margin-top:8px" class="hint">
+      <b>الوجبات:</b> ${formatItems(o.items).join("، ")} • <b>الوقت:</b> <span class="mono">${o.time}</span><br>
+      <b>ملاحظات:</b> ${o.note ? o.note : "—"}
+    </div>
+  `;
+}
+
+document.getElementById("btnOrder").addEventListener("click", ()=>{
+  if(!isOpenNow()) return toast("انتهى وقت الطلب");
+
+  const grade = gradeSel.value;
+  const section = sectionSel.value;
+  const name = studentSel.value;
+  const items = getSelectedMealsDetailed();
+  const note = document.getElementById("note").value.trim();
+
+  if(!grade || !section || !name) return toast("رجاءً اختاري (الصف/الشعبة/الاسم)");
+  if(items.length === 0) return toast("رجاءً اختاري وجبة واحدة على الأقل.");
+  if(findOrderToday(name, grade, section)) return toast("تم تسجيل طلبك مسبقًا اليوم.");
+
+  orders.unshift({
+    id: (crypto?.randomUUID ? crypto.randomUUID() : String(Date.now())+Math.random().toString(16).slice(2)),
+    date: todayKey(),
+    time: nowHMS(),
+    name, grade, section,
+    items,
+    note
+  });
+
+  saveJSON(LS.orders, orders);
+  toast("تم إرسال الطلب ✅");
+  document.getElementById("note").value = "";
+  clearMealsSelection();
+  qtyMap = {};
+  renderAll();
+});
+
+document.getElementById("btnClear").addEventListener("click", ()=>{
+  gradeSel.value = "";
+  sectionSel.value = "";
+  studentSel.value = "";
+  sectionSel.disabled = true;
+  studentSel.disabled = true;
+  document.getElementById("note").value = "";
+  clearMealsSelection();
+  qtyMap = {};
+  renderMyOrder();
+});
+
+/* ====== لوحة المشرفة: KPI + جدول ====== */
+function getTodayOrders(){ return orders.filter(o=>o.date===todayKey()); }
+
+function computeCounts(ordersArr){
+  const counts = {};
+  ordersArr.forEach(o=>{
+    (o.items||[]).forEach(it=>{
+      // يدعم الشكل القديم (نص) والشكل الجديد ({name,qty})
+      if(typeof it === 'string'){
+        const key = it;
+        counts[key] = (counts[key]||0) + 1;
+      }else if(it && typeof it === 'object'){
+        const key = it.name || it.item || 'صنف';
+        const q = Number(it.qty || it.count || 1) || 1;
+        counts[key] = (counts[key]||0) + q;
+      }
+    });
+  });
+  return counts;
+}
+function topItemLine(counts){
+  const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  if(entries.length===0) return { top:"—", topLine:"—" };
+  const top = entries[0][0];
+  const top3 = entries.slice(0,3).map(([k,v])=>`${k} × ${v}`).join(" • ");
+  return { top, topLine: `${entries[0][0]} × ${entries[0][1]} | Top 3: ${top3}` };
+}
+
+function renderAdminTable(){
+  const tb = document.querySelector("#ordersTable tbody");
+  const today = getTodayOrders();
+  tb.innerHTML = "";
+
+  if(today.length===0){
+    tb.innerHTML = `<tr><td colspan="7" style="color:#64748b">لا توجد طلبات اليوم.</td></tr>`;
+  }else{
+    today.forEach((o,i)=>{
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${i+1}</td>
+        <td class="mono">${o.time}</td>
+        <td>${escapeHtml(o.name)}</td>
+        <td>${escapeHtml(o.grade)}</td>
+        <td>${escapeHtml(o.section)}</td>
+        <td><b>${escapeHtml(formatItems(o.items).join("، "))}</b></td>
+        <td>${escapeHtml(o.note ? o.note : "—")}</td>
+      `;
+      tb.appendChild(tr);
+    });
+  }
+
+  const counts = computeCounts(today);
+  const entries = Object.entries(counts);
+  const { top } = topItemLine(counts);
+
+  document.getElementById("kpiTotal").textContent = today.length;
+  document.getElementById("kpiItems").textContent = entries.length;
+  document.getElementById("kpiTop").textContent = top || "—";
+}
+
+document.getElementById("btnClearToday").addEventListener("click", ()=>{
+  if(!isUnlocked()) return toast("اللوحة مقفلة");
+  if(!confirm("مسح طلبات اليوم فقط؟")) return;
+  orders = orders.filter(o=>o.date !== todayKey());
+  saveJSON(LS.orders, orders);
+  renderAll();
+});
+
+/* ====== PDF ====== */
+function buildPdfContent(){
+  const today = getTodayOrders();
+  const d = new Date();
+  document.getElementById("pdfDate").textContent = `${d.getFullYear()}/${pad2(d.getMonth()+1)}/${pad2(d.getDate())}`;
+  document.getElementById("pdfDeadline").textContent = settings.deadline || DEFAULTS.deadline;
+  document.getElementById("pdfExportTime").textContent = nowHM();
+
+  const tb = document.getElementById("pdfTable");
+  tb.innerHTML = "";
+
+  if(today.length===0){
+    tb.innerHTML = `<tr><td colspan="7" style="border:1px solid #ddd;padding:10px;color:#666">لا توجد طلبات اليوم.</td></tr>`;
+  }else{
+    today.forEach((o,i)=>{
+      tb.innerHTML += `
+        <tr>
+          <td style="border:1px solid #ddd;padding:6px">${i+1}</td>
+          <td style="border:1px solid #ddd;padding:6px" class="mono">${o.time}</td>
+          <td style="border:1px solid #ddd;padding:6px">${escapeHtml(o.name)}</td>
+          <td style="border:1px solid #ddd;padding:6px">${escapeHtml(o.grade)}</td>
+          <td style="border:1px solid #ddd;padding:6px">${escapeHtml(o.section)}</td>
+          <td style="border:1px solid #ddd;padding:6px"><b>${escapeHtml(formatItems(o.items).join("، "))}</b></td>
+          <td style="border:1px solid #ddd;padding:6px">${escapeHtml(o.note ? o.note : "—")}</td>
+        </tr>
+      `;
+    });
+  }
+
+  const counts = computeCounts(today);
+  const entries = Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+
+  const sum = document.getElementById("pdfSummary");
+  sum.innerHTML = "";
+  if(entries.length===0){
+    sum.innerHTML = `<div style="padding:8px 10px;border:1px solid #eee;border-radius:999px;background:#fafafa;">لا يوجد ملخص اليوم.</div>`;
+  }else{
+    entries.forEach(([k,v])=>{
+      const chip = document.createElement("div");
+      chip.style.cssText = "padding:8px 10px;border:1px solid #eee;border-radius:999px;background:#fafafa;font-size:12px;";
+      chip.innerHTML = `<b>${escapeHtml(k)}</b> <span style="color:#555">× ${v}</span>`;
+      sum.appendChild(chip);
+    });
+  }
+
+  document.getElementById("pdfKpiTotal").textContent = today.length;
+  document.getElementById("pdfKpiItems").textContent = entries.length;
+  const { topLine } = topItemLine(counts);
+  document.getElementById("pdfTopLine").textContent = topLine || "—";
+  document.getElementById("pdfLastTime").textContent = today.length ? today[0].time : "—";
+}
+
+async function makePdfBlob(){
+  if(!isUnlocked()) { toast("اللوحة مقفلة"); return null; }
+  buildPdfContent();
+
+  const element = document.getElementById("pdfContent");
+  const filename = `طلبات_الإفطار_${todayKey()}.pdf`;
+
+  const opt = {
+    margin: 0,
+    filename,
+    image: { type: "jpeg", quality: 0.98 },
+    html2canvas: { scale: 2, useCORS: true },
+    jsPDF: { unit: "mm", format: "a4", orientation: "portrait" }
+  };
+
+  const worker = html2pdf().set(opt).from(element);
+  const blob = await worker.outputPdf("blob");
+
+  lastPdfBlob = blob;
+  lastPdfName = filename;
+  return blob;
+}
+
+function downloadBlob(blob, filename){
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 800);
+}
+
+document.getElementById("btnMakePdf").addEventListener("click", async ()=>{
+  const blob = await makePdfBlob();
+  if(!blob) return;
+  downloadBlob(blob, lastPdfName || `طلبات_الإفطار_${todayKey()}.pdf`);
+  toast("تم إنشاء PDF وتنزيله ✅");
+});
+
+/* ====== مشاركة واتساب ====== */
+async function sharePdfOnWhatsApp(){
+  const blob = lastPdfBlob || await makePdfBlob();
+  if(!blob) return;
+
+  const filename = lastPdfName || `طلبات_الإفطار_${todayKey()}.pdf`;
+  const file = new File([blob], filename, { type: "application/pdf" });
+
+  try{
+    if(navigator.canShare && navigator.canShare({ files: [file] })){
+      await navigator.share({
+        title: "طلبات الإفطار",
+        text: `طلبات الإفطار لليوم ${todayKey()} — مدرسة عائشة بنت طلحة`,
+        files: [file]
+      });
+      return;
+    }
+  }catch(e){}
+
+  // بديل الكمبيوتر
+  downloadBlob(blob, filename);
+  const msg = encodeURIComponent(
+    `طلبات الإفطار لليوم ${todayKey()} — مدرسة عائشة بنت طلحة\n` +
+    `✅ تم تنزيل ملف PDF، يرجى إرفاقه هنا وإرساله.`
+  );
+  const wa = (settings.cookWA || "").trim();
+  const url = wa ? `https://wa.me/${wa}?text=${msg}` : `https://wa.me/?text=${msg}`;
+  window.open(url, "_blank");
+}
+document.getElementById("btnShareWA").addEventListener("click", sharePdfOnWhatsApp);
+
+/* ====== QR ====== */
+let qr = null;
+function renderQR(){
+  const canvas = document.getElementById("qrCanvas");
+  const textEl = document.getElementById("qrText");
+  const url = (settings.pageUrl || "").trim();
+  textEl.textContent = url || "(ضعي رابط صفحة الطلب هنا)";
+
+  if(!qr){
+    qr = new QRious({ element: canvas, size: 210, value: url || "ضع رابط صفحة الطلب هنا" });
+  }else{
+    qr.set({ value: url || "ضع رابط صفحة الطلب هنا" });
+  }
+}
+
+document.getElementById("btnSaveQrWa").addEventListener("click", ()=>{
+  if(!isUnlocked()) return toast("اللوحة مقفلة");
+  settings.pageUrl = (document.getElementById("pageUrl").value || "").trim();
+  settings.cookWA  = (document.getElementById("cookWhatsApp").value || "").trim();
+  saveJSON(LS.settings, settings);
+  renderQR();
+  toast("تم الحفظ ✅");
+});
+
+document.getElementById("btnRefreshQr").addEventListener("click", renderQR);
+document.getElementById("btnCopyUrl").addEventListener("click", async ()=>{
+  const url = (settings.pageUrl || "").trim();
+  if(!url) return toast("لا يوجد رابط محفوظ");
+  try{ await navigator.clipboard.writeText(url); toast("تم نسخ الرابط"); }
+  catch(e){ toast("لم يتم النسخ تلقائيًا. انسخي الرابط يدويًا."); }
+});
+
+/* ====== الطالبات: استيراد CSV ====== */
+function parseCSVText(text){
+  const lines = text.split(/\r?\n/).map(l=>l.trim()).filter(Boolean);
+  if(lines.length===0) return [];
+  const first = lines[0].toLowerCase();
+  const startIdx = (first.includes("name") && first.includes("grade") && first.includes("section")) ? 1 : 0;
+
+  const out=[];
+  for(let i=startIdx;i<lines.length;i++){
+    const parts = lines[i].split(",").map(s=>s.trim());
+    if(parts.length < 3) continue;
+    const name=parts[0], grade=parts[1], section=parts[2];
+    if(!name || !grade || !section) continue;
+    out.push({name, grade, section});
+  }
+  return out;
+}
+function rosterKey(r){ return `${r.name}__${r.grade}__${r.section}`; }
+
+async function importCSV(){
+  if(!isUnlocked()) return toast("اللوحة مقفلة");
+  const f = document.getElementById("csvFile").files?.[0];
+  let text = (document.getElementById("csvPaste").value || "").trim();
+
+  if(!text && f) text = await f.text();
+  if(!text) return toast("ارفعي ملف CSV أو الصقي البيانات.");
+
+  const data = parseCSVText(text);
+  if(data.length===0) return toast("لم يتم العثور على بيانات صالحة. تأكدي من الأعمدة: name,grade,section");
+
+  const map = new Map(roster.map(r=>[rosterKey(r), r]));
+  data.forEach(r=>map.set(rosterKey(r), r));
+  roster = Array.from(map.values());
+
+  saveJSON(LS.roster, roster);
+  toast(`تم استيراد/دمج ${data.length} سجل ✅`);
+  renderRosterInfo();
+  renderRosterFilters();
+}
+
+function downloadTemplate(){
+  const tpl = "name,grade,section\nآمنة الهنائية,السابع,أ\nمها الكندية,السابع,أ\n";
+  const blob = new Blob([tpl], {type:"text/csv;charset=utf-8"});
+  const a=document.createElement("a");
+  a.href=URL.createObjectURL(blob);
+  a.download="template_students.csv";
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(a.href), 600);
+}
+
+function renderRosterInfo(){
+  const el = document.getElementById("rosterInfo");
+  if(roster.length===0){
+    el.className="okBox";
+    el.innerHTML = "لا توجد بيانات طالبات بعد.";
+    return;
+  }
+  const grades = unique(roster.map(r=>r.grade)).length;
+  const secs = unique(roster.map(r=>`${r.grade}__${r.section}`)).length;
+  el.className="okBox";
+  el.innerHTML = `✅ تم تحميل <b>${roster.length}</b> طالبة
+  <div class="hint small">عدد الصفوف: <b>${grades}</b> • عدد الشعب: <b>${secs}</b></div>`;
+}
+
+document.getElementById("btnImportCsv").addEventListener("click", importCSV);
+document.getElementById("btnDownloadTemplate").addEventListener("click", downloadTemplate);
+document.getElementById("btnClearRoster").addEventListener("click", ()=>{
+  if(!isUnlocked()) return toast("اللوحة مقفلة");
+  if(!confirm("مسح قائمة الطالبات بالكامل؟")) return;
+  roster = [];
+  saveJSON(LS.roster, roster);
+  renderRosterInfo();
+  renderRosterFilters();
+  toast("تم مسح القائمة.");
+});
+
+/* ====== الوجبات: تعديل وحفظ ====== */
+document.getElementById("mealsInp").value = (mealsLines||DEFAULTS.mealsLines).join("\n");
+
+document.getElementById("btnSaveMeals").addEventListener("click", ()=>{
+  if(!isUnlocked()) return toast("اللوحة مقفلة");
+  const lines = (document.getElementById("mealsInp").value||"")
+    .split(/\r?\n/).map(s=>s.trim()).filter(Boolean);
+  if(lines.length===0) return toast("أضيفي وجبة واحدة على الأقل.");
+  mealsLines = lines;
+  saveJSON(LS.meals, mealsLines);
+  renderMealsPicker();
+  toast("تم حفظ الوجبات ✅");
+});
+
+document.getElementById("btnMealsDefault").addEventListener("click", ()=>{
+  if(!isUnlocked()) return toast("اللوحة مقفلة");
+  mealsLines = DEFAULTS.mealsLines.slice();
+  saveJSON(LS.meals, mealsLines);
+  document.getElementById("mealsInp").value = mealsLines.join("\n");
+  renderMealsPicker();
+  toast("تمت الاستعادة.");
+});
+
+/* ====== الإعدادات العامة ====== */
+document.getElementById("deadlineInp").value = settings.deadline || DEFAULTS.deadline;
+
+document.getElementById("btnSaveSettings").addEventListener("click", ()=>{
+  if(!isUnlocked()) return toast("اللوحة مقفلة");
+  const dl = (document.getElementById("deadlineInp").value||"").trim() || DEFAULTS.deadline;
+  if(timeToMin(dl)===null) return toast("صيغة الوقت غير صحيحة. مثال: 09:00");
+  settings.deadline = dl;
+
+  const pin = (document.getElementById("pinInp").value||"").trim();
+  if(pin){
+    if(!/^\d{4}$/.test(pin)) return toast("رمز الإدارة يجب أن يكون 4 أرقام.");
+    localStorage.setItem(LS.pin, pin);
+    document.getElementById("pinInp").value="";
+  }
+
+  saveJSON(LS.settings, settings);
+  updateGate();
+  toast("تم حفظ الإعدادات ✅");
+});
+
+document.getElementById("btnDefaultsAll").addEventListener("click", ()=>{
+  if(!isUnlocked()) return toast("اللوحة مقفلة");
+  if(!confirm("استعادة الافتراضي (الإعدادات + الوجبات)؟")) return;
+  settings = {...DEFAULTS};
+  mealsLines = DEFAULTS.mealsLines.slice();
+  saveJSON(LS.settings, settings);
+  saveJSON(LS.meals, mealsLines);
+  document.getElementById("deadlineInp").value = settings.deadline;
+  document.getElementById("mealsInp").value = mealsLines.join("\n");
+  renderMealsPicker();
+  renderQR();
+  updateGate();
+  toast("تمت الاستعادة.");
+});
+
+/* ====== فتح/قفل ====== */
+document.getElementById("btnUnlock").addEventListener("click", ()=>{
+  const pin = prompt("أدخلي رمز الإدارة (الافتراضي 1234):");
+  if(pin === null) return;
+  if(String(pin).trim() === getPin()){
+    setUnlocked(true);
+    syncAdminUI();
+    renderAll();
+  }else{
+    toast("رمز غير صحيح");
+  }
+});
+document.getElementById("btnLock").addEventListener("click", ()=>{
+  setUnlocked(false);
+  syncAdminUI();
+});
+
+/* ====== حماية ضد XSS بسيط ====== */
+function escapeHtml(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#39;");
+}
+
+function formatItems(itemsArr){
+  const out=[];
+  (itemsArr||[]).forEach(it=>{
+    if(typeof it==='string') out.push(it);
+    else if(it && typeof it==='object'){
+      const name = it.name || it.item || 'صنف';
+      const q = Number(it.qty || it.count || 1) || 1;
+      out.push(`${name} × ${q}`);
+    }
+  });
+  return out;
+}
+
+/* ====== Render All ====== */
+function renderAll(){
+  // تزامن حقول QR/WA
+  const pageUrlInp = document.getElementById("pageUrl");
+  const cookWAInp  = document.getElementById("cookWhatsApp");
+  if(pageUrlInp) pageUrlInp.value = settings.pageUrl || "";
+  if(cookWAInp) cookWAInp.value = settings.cookWA || "";
+
+  document.getElementById("deadlineShow").textContent = settings.deadline || DEFAULTS.deadline;
+  document.getElementById("deadlineInp").value = settings.deadline || DEFAULTS.deadline;
+
+  renderMealsPicker();
+  renderRosterInfo();
+  renderRosterFilters();
+  renderMyOrder();
+  updateGate();
+  renderQR();
+  if(isUnlocked()) renderAdminTable();
+}
+
+/* تشغيل */
+function boot(){
+  saveJSON(LS.settings, settings);
+  syncAdminUI();
+  renderAll();
+  setInterval(updateGate, 10000);
+}
+boot();
+</script>
+
+</body>
+</html>
